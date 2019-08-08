@@ -67,12 +67,6 @@ For more information about our Robots, please visit our website: [M&amp;A Roboti
 - 2nd Place
 #### International Championships 2019
 - 1st Place
-### Brisbane Regional Competition 2019
-- 1st Place
-#### Queensland State Competition 2018
-- TBA
-#### Australian National Competition Competition 2018
-- TBA
 ---------------------------------------------------------------------------------
 ![forthebadge](https://forthebadge.com/images/badges/uses-git.svg)
 ![forthebadge](https://forthebadge.com/images/badges/made-with-c-plus-plus.svg)
