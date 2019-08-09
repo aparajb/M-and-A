@@ -10,7 +10,7 @@ Alternatively, please contact the Head of Soccer at BBC: [Steven Lau](mailto:sla
 
 For more information about Robocup Australia, please visit: [Robocup Junior Australia](https://www.robocupjunior.org.au/).
 
-For more information about our Robots, please visit our website: [M&amp;A Robotics](bbcrobotics-mna.weebly.com).
+For more information about our Robots, please visit our website: [M&amp;A Robotics](https://bbcrobotics-mna.weebly.com).
 
 ## Folder Structure
 - M&amp;A 2018 : All the designs, electronics and software for our 2018 national robots
