@@ -57,9 +57,7 @@ Movement calculateDefenseMovement() {
     if(tssps.ballVisible) {
         if(tssps.ballStr > DEFEND_CHARGE_STRENGTH) {
             if(angleIsInside(345, 15, tssps.ballDir)) {
-                if(bluetooth.isConnected) {
-                    bluetooth.isSwitching = true;
-                }
+                bluetooth.isSwitching = bluetooth.isConnected;
                 if(camera.defendingGoalVisible && camera.defendingGoalDistance < SURGE_DISTANCE) {
                     return calculateAttackMovement();
                 }
@@ -84,20 +82,20 @@ void updateMovement() {
 }
 
 void setup() {
-    delay(500);
-    imu.init();
+    // delay(500);
+    // imu.init();
     camera.init();
-    bluetooth.init();
-    lightSensors.init();
-    motors.init();
-    tssps.init();
+    // bluetooth.init();
+    // lightSensors.init();
+    // motors.init();
+    // tssps.init();
 }
 
 void loop() {
-    imu.update();
+    // imu.update();
     camera.update();
-    lightSensors.update(imu.heading);
-    tssps.update();
-    updateMovement();
-    bluetooth.update(tssps.ballDir, tssps.ballStr);
+    // lightSensors.update(imu.heading);
+    // tssps.update();
+    // updateMovement();
+    // bluetooth.update(tssps.ballDir, tssps.ballStr);
 }

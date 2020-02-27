@@ -4,15 +4,15 @@ from math import atan2, sqrt
 from pyb import UART
 
 ROBOT_A = False
-ATTACK_BLUE = False
+ATTACK_BLUE = True
 DEGREES_TO_RADIANS = 0.017453292519943295769236907684886
 RADIANS_TO_DEGREES = 57.295779513082320876798154814105
 
 # Individual
 if ROBOT_A:
-    thresholds = [((83, 98, -28, 14, 22, 63),), ((58, 80, -28, -9, -41, -12),)] # Yellow  is first
+    thresholds = [((45, 76, -12, 16, 30, 71),), ((27, 46, -5, 21, -57, -21),)] # Yellow  is first
 else:
-    thresholds = [((63, 79, -3, 18, 20, 59),), ((40, 54, -16, 6, -37, -16),)] # Yellow  is first
+    thresholds = [((43, 61, 4, 25, 12, 59),), ((32, 49, -4, 19, -47, -16),)] # Yellow  is first
 
 # Superteam
 #if ROBOT_A:

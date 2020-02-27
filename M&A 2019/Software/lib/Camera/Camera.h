@@ -17,6 +17,7 @@ public:
 private:
     int16_t goalAdd;
     void calculateGoalAttributes();
+    unsigned long previousTime = millis();
 };
 
 #endif
