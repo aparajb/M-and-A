@@ -75,27 +75,22 @@ Movement calculateDefenseMovement() {
     return calculateMove(0, 0);
 }
 
-void updateMovement() {
-    bluetooth.thisData.role = true;
-    Movement finalMovement = bluetooth.thisData.role ? lightSensors.calculateOutAvoidance(imu.heading, calculateAttackMovement()) : lightSensors.calculateOutAvoidance(imu.heading, calculateDefenseMovement());
-    motors.update(finalMovement);
-}
-
 void setup() {
-    // delay(500);
-    // imu.init();
+    delay(500);
+    imu.init();
     camera.init();
-    // bluetooth.init();
-    // lightSensors.init();
-    // motors.init();
-    // tssps.init();
+    bluetooth.init();
+    lightSensors.init();
+    motors.init();
+    tssps.init();
 }
 
 void loop() {
-    // imu.update();
+    imu.update();
     camera.update();
-    // lightSensors.update(imu.heading);
-    // tssps.update();
-    // updateMovement();
-    // bluetooth.update(tssps.ballDir, tssps.ballStr);
+    lightSensors.update(imu.heading);
+    tssps.update();
+    bluetooth.update(tssps.ballDir, tssps.ballStr);
+    Movement finalMovement = lightSensors.calculateOutAvoidance(imu.heading, bluetooth.thisData.role ? calculateAttackMovement() : calculateDefenseMovement());
+    motors.update(finalMovement);
 }
