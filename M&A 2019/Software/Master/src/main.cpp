@@ -36,19 +36,20 @@ Movement calculateAttackMovement() {
     Movement sendVal;
     if(tssps.ballVisible) {
         sendVal.direction = floatMod(tssps.ballDir + tssps.calculateAngleAddition(), 360);
-        if(camera.attackingGoalVisible && bluetooth.thisData.role) {
-            sendVal.correction = -attackGoalTrackPID.update((camera.attackingGoalAngle > 180 ? camera.attackingGoalAngle - 360 : camera.attackingGoalAngle), 0);
-        } else {
+        // if(camera.attackingGoalVisible && bluetooth.thisData.role) {
+        //     sendVal.correction = -attackGoalTrackPID.update((camera.attackingGoalAngle > 180 ? camera.attackingGoalAngle - 360 : camera.attackingGoalAngle), 0);
+        // } else {
             sendVal.correction = headingPID.update((imu.heading > 180 ? imu.heading - 360 : imu.heading), 0);
-        }
+        // }
         if(tssps.ballStr > DEFEND_CHARGE_STRENGTH && angleIsInside(0, 5, tssps.ballDir)) {
             sendVal.speed = ORBIT_FAST_SPEED;
         } else {
             sendVal.speed = ORBIT_SLOW_SPEED + (ORBIT_MEDIUM_SPEED - ORBIT_SLOW_SPEED) * (1.0 - abs(tssps.angleAddition) / 90.0);
         }
         return sendVal;
-    } else if(camera.defendingGoalVisible) {
-        return calculateMove(centreDistancePID.update(camera.defendingGoalDistance, ATTACK_IDLE_DISTANCE), 0);
+    
+    // } else if(camera.defendingGoalVisible) {
+    //     return calculateMove(centreDistancePID.update(camera.defendingGoalDistance, ATTACK_IDLE_DISTANCE), 0);
     }
     return calculateMove(0, 0);
 }
@@ -87,10 +88,10 @@ void setup() {
 
 void loop() {
     imu.update();
-    camera.update();
+    // camera.update();
     lightSensors.update(imu.heading);
     tssps.update();
-    bluetooth.update(tssps.ballDir, tssps.ballStr);
-    Movement finalMovement = lightSensors.calculateOutAvoidance(imu.heading, bluetooth.thisData.role ? calculateAttackMovement() : calculateDefenseMovement());
+    // bluetooth.update(tssps.ballDir, tssps.ballStr);
+    Movement finalMovement = lightSensors.calculateOutAvoidance(imu.heading, calculateAttackMovement());//bluetooth.thisData.role ? calculateAttackMovement() : calculateDefenseMovement());
     motors.update(finalMovement);
 }
