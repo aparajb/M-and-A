@@ -4,6 +4,14 @@
 // Battery Indicator
 #define BATTERY_INDICATOR_PIN A21
 
+// Debug
+#define DEBUG_BINARY_0 20
+#define DEBUG_BINARY_1 21
+#define DEBUG_BINARY_2 22
+#define DEBUG_BINARY_3 23
+#define DEBUG_OUTPUT 
+
+
 // Pins for TSSPs
 #define TSSP_PIN_0 15
 #define TSSP_PIN_1 14
