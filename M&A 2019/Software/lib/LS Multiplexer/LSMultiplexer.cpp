@@ -41,7 +41,7 @@ void LSMultiplexer::update(float heading) {
                 onWhite[i] = true;
             }
         }
-    } 
+    }
 	uint8_t clustersNum = 0;
     bool findClusterStarts = true;
     int8_t clusterStarts[4] = {-1, -1, -1, -1};

@@ -1,108 +1,57 @@
 import sensor, image, time
 import pyb
-from math import atan2, sqrt
-from pyb import UART
 
-ROBOT_A = False
-ATTACK_BLUE = True
-DEGREES_TO_RADIANS = 0.017453292519943295769236907684886
-RADIANS_TO_DEGREES = 57.295779513082320876798154814105
+ROBOT_A = True
+YELLOW = 1
+BLUE = 2
+ORANGE = 4
+FRAME_WIDTH = 240
+FRAME_HEIGHT = 240
 
-# Individual
-if ROBOT_A:
-    thresholds = [((45, 76, -12, 16, 30, 71),), ((27, 46, -5, 21, -57, -21),)] # Yellow  is first
-else:
-    thresholds = [((43, 61, 4, 25, 12, 59),), ((32, 49, -4, 19, -47, -16),)] # Yellow  is first
-
-# Superteam
-#if ROBOT_A:
-    #thresholds = [((39, 57, 5, 40, 8, 57),), ((17, 26, -2, 41, -59, -14),)] # Yellow  is first
-#else:
-    #thresholds = [((38, 61, 4, 43, 7, 64),), ((16, 21, -1, 23, -35, -16),)] # Yellow  is first
+# Yellow, Blue, Orange
+thresholds = [(49, 64, -1, 18, 28, 53), (29, 52, -14, 20, -61, -28), (46, 66, 21, 80, 19, 67)]
 
 sensor.reset()
 redLED = pyb.LED(1)
 redLED.on()
 sensor.set_pixformat(sensor.RGB565)
-sensor.set_framesize(sensor.QQVGA)
+sensor.set_framesize(sensor.QVGA)
 sensor.skip_frames(time = 2000)
 sensor.set_auto_gain(False)
-sensor.set_auto_whitebal(False, (-5.623446, -6.02073, -1.317097))
-sensor.set_brightness(1)
+sensor.set_auto_whitebal(False, (-4.08286, -6.02073, -3.35391))
+sensor.set_brightness(0)
 sensor.set_contrast(0)
-sensor.set_saturation(2)
+sensor.set_saturation(0)
+sensor.set_windowing((FRAME_WIDTH, FRAME_HEIGHT))
 clock = time.clock()
-uart = UART(3, 115200, timeout_char = 10)
+uart = pyb.UART(3, 115200, timeout_char = 10)
 redLED.off()
-if ATTACK_BLUE:
-    while(True):
-        data = [-1, -1, -1, -1]
-        clock.tick()
-        img = sensor.snapshot()
-        blobs = img.find_blobs(thresholds[1], x_stride=5, y_stride=5, area_threshold=200, pixel_threshold=200, merge=True, margin=23)
-        if len(blobs) != 0:
-            largest_blob = sorted(blobs, key=lambda blob: -blob.area())[0]
-            data[0] = round(360 - RADIANS_TO_DEGREES * atan2(largest_blob.cy() - 60, largest_blob.cx() - 80))
-            if data[0] > 360:
-                data[0] -= 360
-            if data[0] < 0:
-                data[0] += 360
-            data[1] = round(sqrt((largest_blob.cx() - 80)**2 + (largest_blob.cy() - 60)**2))
-            #img.draw_line(80, 60, largest_blob.cx(), largest_blob.cy()) # Not needed for Gameplay
-        blobs = img.find_blobs(thresholds[0], x_stride=5, y_stride=5, area_threshold=200, pixel_threshold=200, merge=True, margin=23)
-        if len(blobs) != 0:
-            largest_blob = sorted(blobs,key=lambda blob: -blob.area())[0]
-            data[2] = round(360 - RADIANS_TO_DEGREES * atan2(largest_blob.cy() - 60, largest_blob.cx() - 80))
-            if data[2] > 360:
-                data[2] -= 360
-            if data[2] < 0:
-                data[2] += 360
-            data[3] = round(sqrt((largest_blob.cx() - 80)**2 + (largest_blob.cy() - 60)**2))
-            #img.draw_line(80, 60, largest_blob.cx(), largest_blob.cy()) # Not needed for Gameplay
-        #print(clock.fps()) # Not needed for Gameplay
-        uart.writechar(255)
-        uart.writechar(255)
-        uart.writechar(data[0] >> 8)
-        uart.writechar(data[0])
-        uart.writechar(data[1])
-        uart.writechar(data[2] >> 8)
-        uart.writechar(data[2])
-        uart.writechar(data[3])
-        #img.draw_line(82, 60, 78, 60)
-        #img.draw_line(80, 62, 80, 58)
-else:
-    while(True):
-        data = [-1, -1, -1, -1]
-        clock.tick()
-        img = sensor.snapshot()
-        blobs = img.find_blobs(thresholds[0], x_stride=5, y_stride=5, area_threshold=200, pixel_threshold=200, merge=True, margin=23)
-        if len(blobs) != 0:
-            largest_blob = sorted(blobs, key=lambda blob: -blob.area())[0]
-            data[0] = round(360 - RADIANS_TO_DEGREES * atan2(largest_blob.cy() - 60, largest_blob.cx() - 80))
-            if data[0] > 360:
-                data[0] -= 360
-            if data[0] < 0:
-                data[0] += 360
-            data[1] = round(sqrt((largest_blob.cx() - 80)**2 + (largest_blob.cy() - 60)**2))
-            #img.draw_line(80, 60, largest_blob.cx(), largest_blob.cy()) # Not needed for Gameplay
-        blobs = img.find_blobs(thresholds[1], x_stride=5, y_stride=5, area_threshold=200, pixel_threshold=200, merge=True, margin=23)
-        if len(blobs) != 0:
-            largest_blob = sorted(blobs,key=lambda blob: -blob.area())[0]
-            data[2] = round(360 - RADIANS_TO_DEGREES * atan2(largest_blob.cy() - 60, largest_blob.cx() - 80))
-            if data[2] > 360:
-                data[2] -= 360
-            if data[2] < 0:
-                data[2] += 360
-            data[3] = round(sqrt((largest_blob.cx() - 80)**2 + (largest_blob.cy() - 60)**2))
-            #img.draw_line(80, 60, largest_blob.cx(), largest_blob.cy()) # Not needed for Gameplay
-        #print(clock.fps()) # Not needed for Gameplay
-        uart.writechar(255)
-        uart.writechar(255)
-        uart.writechar(data[0] >> 8)
-        uart.writechar(data[0])
-        uart.writechar(data[1])
-        uart.writechar(data[2] >> 8)
-        uart.writechar(data[2])
-        uart.writechar(data[3])
-        #img.draw_line(82, 60, 78, 60)
-        #img.draw_line(80, 62, 80, 58)
+
+while(True):
+    data = [120, 120, 120, 120, 120, 120]
+    clock.tick()
+    img = sensor.snapshot()
+    blobs = img.find_blobs(thresholds, x_stride = 5, y_stride = 5, area_threshold = 0, pixel_threshold = 200, merge = False, margin = 23)
+    blobs = sorted(blobs, key=lambda blob: -blob.area())
+    yellow = None
+    blue = None
+    orange = None
+    for blob in blobs:
+        if data[0] == 120 and data[1] == 120 and blob.code() == YELLOW:
+            data[0] = 240 - blob.cx()
+            data[1] = 240 - blob.cy()
+        if data[2] == 120 and data[3] == 120 and blob.code() == BLUE:
+            data[2] = 240 - blob.cx()
+            data[3] = 240 - blob.cy()
+        if data[4] == 120 and data[5] == 120 and blob.code() == ORANGE:
+            data[4] = 240 - blob.cx()
+            data[5] = 240 - blob.cy()
+    uart.writechar(234)
+    uart.writechar(234)
+    for byte in data:
+        uart.writechar(byte)
+    #img.draw_line(round(FRAME_WIDTH / 2) - 10, round(FRAME_HEIGHT / 2), round(FRAME_WIDTH / 2) + 10, round(FRAME_HEIGHT / 2))
+    #img.draw_line(round(FRAME_WIDTH / 2), round(FRAME_HEIGHT / 2) + 10, round(FRAME_WIDTH / 2), round(FRAME_HEIGHT / 2) - 10)
+    #img.draw_line(round(FRAME_WIDTH / 2), round(FRAME_HEIGHT / 2), 240 - data[0], 240 - data[1])
+    #img.draw_line(round(FRAME_WIDTH / 2), round(FRAME_HEIGHT / 2), 240 - data[2], 240 - data[3])
+    #img.draw_line(round(FRAME_WIDTH / 2), round(FRAME_HEIGHT / 2), 240 - data[4], 240 - data[5])

@@ -23,8 +23,10 @@ TSSPs tssps;
 Movement calculateMove(float vertical, float horizontal) {
     Movement sendVal;
     sendVal.direction = floatMod(RADIANS_TO_DEGREES * atan2f(horizontal, vertical), 360);
-    if(camera.defendingGoalVisible && !bluetooth.thisData.role && tssps.ballVisible) {
-        sendVal.correction = -defendGoalTrackPID.update(camera.defendingGoalAngle, 180);
+    if(camera.robot.exists() && camera.ball.exists()) {
+        Vect goal = Vect(DEFEND_X, DEFEND_Y, false) - camera.robot;
+        sendVal.correction = -defendGoalTrackPID.update(imu.heading - floatMod(goal.arg + 180, 360.0), 0);
+        // sendVal.correction = -defendGoalTrackPID.update(camera.defendingGoalAngle, 180);
     } else {
         sendVal.correction = headingPID.update((imu.heading > 180 ? imu.heading - 360 : imu.heading), 0);
     }
@@ -34,46 +36,44 @@ Movement calculateMove(float vertical, float horizontal) {
 
 Movement calculateAttackMovement() {
     Movement sendVal;
-    if(tssps.ballVisible) {
-        sendVal.direction = floatMod(tssps.ballDir + tssps.calculateAngleAddition(), 360);
-        // if(camera.attackingGoalVisible && bluetooth.thisData.role) {
-        //     sendVal.correction = -attackGoalTrackPID.update((camera.attackingGoalAngle > 180 ? camera.attackingGoalAngle - 360 : camera.attackingGoalAngle), 0);
-        // } else {
-            sendVal.correction = headingPID.update((imu.heading > 180 ? imu.heading - 360 : imu.heading), 0);
-        // }
-        if(tssps.ballStr > DEFEND_CHARGE_STRENGTH && angleIsInside(0, 5, tssps.ballDir)) {
+    if(camera.ball.exists()) {
+        float dir = camera.ball.arg > 270 ? camera.ball.arg - 450 : camera.ball.arg - 90;
+        float ballAngleDifference = findSign(dir) * fmin(90, 0.4 * expf(0.25 * abs(dir)));
+        float distMulti = -2.4713 * pow(10, -9) * expf(0.0329173 * (camera.ball.mag + 540.497)) + 1.19426;
+        float angleAdd = distMulti * ballAngleDifference;
+        sendVal.direction = floatMod(450 - camera.ball.arg - angleAdd, 360.0);
+        sendVal.correction = headingPID.update((imu.heading > 180 ? imu.heading - 360 : imu.heading), 0);
+        if(camera.ball.mag < 30 && angleIsInside(70, 110, camera.ball.arg)) {
             sendVal.speed = ORBIT_FAST_SPEED;
         } else {
-            sendVal.speed = ORBIT_SLOW_SPEED + (ORBIT_MEDIUM_SPEED - ORBIT_SLOW_SPEED) * (1.0 - abs(tssps.angleAddition) / 90.0);
+            sendVal.speed = ORBIT_SLOW_SPEED + (ORBIT_MEDIUM_SPEED - ORBIT_SLOW_SPEED) * (1.0 - abs(angleAdd) / 90.0);
         }
         return sendVal;
-    
-    // } else if(camera.defendingGoalVisible) {
-    //     return calculateMove(centreDistancePID.update(camera.defendingGoalDistance, ATTACK_IDLE_DISTANCE), 0);
+    // } else if(camera.robot.exists) {
+    //     return calculateMove(centreDistancePID.update(-40 - cam.robot.jcamera.defendingGoalDistance, ATTACK_IDLE_DISTANCE), 0);
     }
     return calculateMove(0, 0);
 }
 
 Movement calculateDefenseMovement() {
-    if(tssps.ballVisible) {
-        if(tssps.ballStr > DEFEND_CHARGE_STRENGTH) {
-            if(angleIsInside(345, 15, tssps.ballDir)) {
-                bluetooth.isSwitching = bluetooth.isConnected;
-                if(camera.defendingGoalVisible && camera.defendingGoalDistance < SURGE_DISTANCE) {
-                    return calculateAttackMovement();
-                }
-            }
-        }
-        if(angleIsInside(270, 90, tssps.ballDir)) {
-            float sideways = tssps.ballDir > 180 ? tssps.ballDir - 360 : tssps.ballDir;
-            float distance = camera.defendingGoalVisible ? camera.defendingGoalDistance : DEFEND_GOAL_DISTANCE;
-            return calculateMove(distancePID.update(distance, DEFEND_GOAL_DISTANCE), sidewaysPID.update(sideways, 0));
-        }
-        return calculateAttackMovement();
-    } else if(camera.defendingGoalVisible) {
-        return calculateMove(centreDistancePID.update(camera.defendingGoalDistance, DEFEND_GOAL_DISTANCE), 0);
-    }
-    return calculateMove(0, 0);
+    // if(camera.ball.exists()) {
+    //     if(camera.ball.mag < 30) {
+    //         if(angleIsInside(70, 110, camera.ball.arg)) {
+    //             if(camera.robot.exists() && camera.robot.j < -30) {
+    //                 return calculateAttackMovement();
+    //             }
+    //         }
+    //     }
+    //     if(angleIsInside(0, 180, camera.ball.arg)) {
+    //         float distance = camera.robot.exists() ? -60 - camera.robot.j : 0;
+    //         return calculateMove(distancePID.update(distance, 0), sidewaysPID.update(90 - camera.ball.arg, 0));
+    //     }
+    //     return calculateAttackMovement();
+    // } else if(camera.robot.exists()) {
+        Vect temp = Vect(DEFEND_X, DEFEND_Y, false) - camera.robot;
+        return calculateMove(centreDistancePID.update(temp.mag, 40), -camera.robot.i);
+    // }
+    // return calculateMove(0, 0);
 }
 
 void setup() {
@@ -83,15 +83,15 @@ void setup() {
     bluetooth.init();
     lightSensors.init();
     motors.init();
-    tssps.init();
+    // tssps.init();
 }
 
 void loop() {
     imu.update();
-    // camera.update();
+    camera.update(imu.heading, true);
     lightSensors.update(imu.heading);
-    tssps.update();
+    // tssps.update();
     // bluetooth.update(tssps.ballDir, tssps.ballStr);
-    Movement finalMovement = lightSensors.calculateOutAvoidance(imu.heading, calculateAttackMovement());//bluetooth.thisData.role ? calculateAttackMovement() : calculateDefenseMovement());
+    Movement finalMovement = lightSensors.calculateOutAvoidance(imu.heading, calculateDefenseMovement());//bluetooth.thisData.role ? calculateAttackMovement() : calculateDefenseMovement());
     motors.update(finalMovement);
 }

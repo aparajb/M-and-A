@@ -2,22 +2,27 @@
 #define CAMERA_H
 
 #include <Common.h>
+#include <Vect.h>
+
+#define CAMERA_PACKET_NUM 8
+#define CENTRE_X 120
+#define CENTRE_Y 120
+#define CAMERA_BAUD 115200
+#define COMS_SYNC_BYTE 234
+
 
 class Camera {
 public:
     Camera();
     void init();
-    void update();
-    bool attackingGoalVisible;
-    float attackingGoalAngle;
-    float attackingGoalDistance;
-    bool defendingGoalVisible;
-    float defendingGoalAngle;
-    float defendingGoalDistance;
+    void update(float heading, bool attackBlue);
+    Vect robot;
+    Vect ball;
 private:
-    int16_t goalAdd;
-    void calculateGoalAttributes();
-    unsigned long previousTime = millis();
+    Vect blueGoal;
+    Vect yellowGoal;
+    float ballPixeltoCM(float dist);
+    float goalPixeltoCM(float dist);
 };
 
 #endif
