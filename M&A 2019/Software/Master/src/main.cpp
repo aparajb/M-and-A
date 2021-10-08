@@ -25,7 +25,15 @@ Movement calculateMove(float vertical, float horizontal) {
     sendVal.direction = floatMod(RADIANS_TO_DEGREES * atan2f(horizontal, vertical), 360);
     if(camera.robot.exists() && camera.ball.exists()) {
         Vect goal = Vect(DEFEND_X, DEFEND_Y, false) - camera.robot;
-        sendVal.correction = -defendGoalTrackPID.update(imu.heading - floatMod(goal.arg + 180, 360.0), 0);
+        float diff = floatMod(450 - imu.heading, 360.0) - floatMod(goal.arg + 180, 360.0);
+        if(diff > 180) {
+            diff -= 360;
+        } else if(diff < -180) {
+            diff += 360;
+        }
+        // correction = defendTrack.update(diff, 0);
+        // Vect goal = Vect(DEFEND_X, DEFEND_Y, false) - camera.robot;
+        sendVal.correction = -defendGoalTrackPID.update(diff, 0);
         // sendVal.correction = -defendGoalTrackPID.update(camera.defendingGoalAngle, 180);
     } else {
         sendVal.correction = headingPID.update((imu.heading > 180 ? imu.heading - 360 : imu.heading), 0);
@@ -38,8 +46,8 @@ Movement calculateAttackMovement() {
     Movement sendVal;
     if(camera.ball.exists()) {
         float dir = camera.ball.arg > 270 ? camera.ball.arg - 450 : camera.ball.arg - 90;
-        float ballAngleDifference = findSign(dir) * fmin(90, 0.4 * expf(0.25 * abs(dir)));
-        float distMulti = -2.4713 * pow(10, -9) * expf(0.0329173 * (camera.ball.mag + 540.497)) + 1.19426;
+        float ballAngleDifference = findSign(dir) * fmin(90, 0.04 * expf(0.15 * abs(dir)));
+        float distMulti = max(0, -0.04 * camera.ball.mag + 2);
         float angleAdd = distMulti * ballAngleDifference;
         sendVal.direction = floatMod(450 - camera.ball.arg - angleAdd, 360.0);
         sendVal.correction = headingPID.update((imu.heading > 180 ? imu.heading - 360 : imu.heading), 0);
@@ -71,9 +79,9 @@ Movement calculateDefenseMovement() {
     //     return calculateAttackMovement();
     // } else if(camera.robot.exists()) {
         Vect temp = Vect(DEFEND_X, DEFEND_Y, false) - camera.robot;
-        return calculateMove(centreDistancePID.update(temp.mag, 40), -camera.robot.i);
+        // return calculateMove(centreDistancePID.update(temp.mag, 40), -camera.robot.i);
     // }
-    // return calculateMove(0, 0);
+    return calculateMove(0, 0);
 }
 
 void setup() {

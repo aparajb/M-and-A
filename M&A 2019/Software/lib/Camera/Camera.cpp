@@ -19,9 +19,9 @@ void Camera::update(float heading, bool attackBlue) {
             int8_t orangeX = Serial1.read() - CENTRE_X;
             int8_t orangeY = Serial1.read() - CENTRE_Y;
             yellowGoal = Vect(yellowX, yellowY, false);
-            yellowGoal.setPolar(goalPixeltoCM(yellowGoal.mag), floatMod(yellowGoal.arg - 90, 360.0));
+            yellowGoal.setPolar(goalPixeltoCM(yellowGoal.mag), floatMod(yellowGoal.arg - heading + 270, 360.0));
             blueGoal = Vect(blueX, blueY, false);
-            blueGoal.setPolar(goalPixeltoCM(blueGoal.mag), floatMod(blueGoal.arg - 90, 360.0));
+            blueGoal.setPolar(goalPixeltoCM(blueGoal.mag), floatMod(blueGoal.arg - heading + 270, 360.0));
             ball = Vect(orangeX, orangeY, false);
             ball.setPolar(ballPixeltoCM(ball.mag), floatMod(ball.arg - 90, 360.0));
             if((blueGoal.exists() && yellowGoal.exists() && blueGoal.mag < yellowGoal.mag) || (blueGoal.exists() && !yellowGoal.exists())) {
@@ -33,8 +33,6 @@ void Camera::update(float heading, bool attackBlue) {
             } else {
                 robot = Vect();
             }
-            Serial.print(robot.mag); Serial.print("\t");
-            Serial.println(robot.arg);
         }
     }
 }
