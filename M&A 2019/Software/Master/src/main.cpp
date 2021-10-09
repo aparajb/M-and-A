@@ -1,13 +1,10 @@
 #include <MPU.h>
-#include <BluetoothModule.h>
 #include <Camera.h>
 #include <LSMultiplexer.h>
 #include <MotorControllers.h>
 #include <PID.h>
-#include <TSSPs.h>
 
 MPU imu;
-BluetoothModule bluetooth;
 Camera camera;
 LSMultiplexer lightSensors;
 MotorControllers motors;
@@ -18,7 +15,6 @@ PID centreSidewaysPID(CENTRE_SIDEWAYS_KP, CENTRE_SIDEWAYS_KI, CENTRE_SIDEWAYS_KD
 PID headingPID(HEADING_KP, HEADING_KI, HEADING_KD, HEADING_MAX_CORRECTION);
 PID attackGoalTrackPID(ATTACK_GOAL_TRACK_KP, ATTACK_GOAL_TRACK_KI, ATTACK_GOAL_TRACK_KD, ATTACK_GOAL_TRACK_MAX_CORRECTION);
 PID defendGoalTrackPID(DEFEND_GOAL_TRACK_KP, DEFEND_GOAL_TRACK_KI, DEFEND_GOAL_TRACK_KD, DEFEND_GOAL_TRACK_MAX_CORRECTION);
-TSSPs tssps;
 
 Movement calculateMove(float vertical, float horizontal) {
     Movement sendVal;
@@ -68,7 +64,7 @@ Movement calculateDefenseMovement() {
     //     if(camera.ball.mag < 30) {
     //         if(angleIsInside(70, 110, camera.ball.arg)) {
     //             if(camera.robot.exists() && camera.robot.j < -30) {
-    //                 return calculateAttackMovement();
+    //                 // return calculateAttackMovement();
     //             }
     //         }
     //     }
@@ -78,8 +74,8 @@ Movement calculateDefenseMovement() {
     //     }
     //     return calculateAttackMovement();
     // } else if(camera.robot.exists()) {
-        Vect temp = Vect(DEFEND_X, DEFEND_Y, false) - camera.robot;
-        // return calculateMove(centreDistancePID.update(temp.mag, 40), -camera.robot.i);
+    //     Vect temp = Vect(DEFEND_X, DEFEND_Y, false) - camera.robot;
+    //     return calculateMove(centreDistancePID.update(temp.mag, 40), -camera.robot.i);
     // }
     return calculateMove(0, 0);
 }
@@ -88,18 +84,16 @@ void setup() {
     delay(500);
     imu.init();
     camera.init();
-    bluetooth.init();
-    lightSensors.init();
+     lightSensors.init();
     motors.init();
-    // tssps.init();
 }
 
 void loop() {
     imu.update();
-    camera.update(imu.heading, true);
+    // camera.update(imu.heading, true);
     lightSensors.update(imu.heading);
     // tssps.update();
-    // bluetooth.update(tssps.ballDir, tssps.ballStr);
+    // Serial.println(lightSensors.lineDir);
     Movement finalMovement = lightSensors.calculateOutAvoidance(imu.heading, calculateDefenseMovement());//bluetooth.thisData.role ? calculateAttackMovement() : calculateDefenseMovement());
     motors.update(finalMovement);
 }

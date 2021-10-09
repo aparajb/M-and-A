@@ -3,6 +3,13 @@
 
 #include <Common.h>
 
+#define MUX1_S0 23
+#define MUX1_S1 22
+#define MUX1_S2 21
+#define MUX1_S3 20
+#define MUX1_OUT 17
+#define MUX2_OUT 16
+
 class LSMultiplexer {
 public:
     LSMultiplexer();

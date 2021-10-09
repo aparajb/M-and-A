@@ -3,10 +3,16 @@
 LSMultiplexer::LSMultiplexer() {}
 
 void LSMultiplexer::init() {
-    for(uint8_t i = 0; i < 5; i++) {
-        pinMode(control[i], OUTPUT);
-    }
-    pinMode(controlOutput, INPUT);
+        pinMode(MUX1_S0, OUTPUT);
+        pinMode(MUX1_S1, OUTPUT);
+        pinMode(MUX1_S2, OUTPUT);
+        pinMode(MUX1_S3, OUTPUT);
+        pinMode(MUX1_OUT, INPUT);
+        pinMode(MUX2_OUT, INPUT);
+    // for(uint8_t i = 0; i < 5; i++) {
+    //     pinMode(control[i], OUTPUT);
+    // }
+    // pinMode(controlOutput, INPUT);
     for(uint8_t i = 0; i < LS_NUM; i++) {
         uint16_t calibrateTotal = 0;
         for (uint8_t j = 0; j < LS_CALIBRATE_COUNT; j++) {
@@ -18,23 +24,48 @@ void LSMultiplexer::init() {
 }
 
 void LSMultiplexer::read(uint8_t LSIndex) {
-    bool binary[5] = {false};
-    float decimal = pins[LSIndex];
-    for(uint8_t i = 4; i >= 0 && decimal >= 1; i--) {
-        binary[i] = ((uint8_t)decimal) % 2;
-        decimal /= 2;
+    // bool binary[5] = {false};
+    // float decimal = pins[LSIndex];
+    // for(uint8_t i = 4; i >= 0 && decimal >= 1; i--) {
+    //     binary[i] = ((uint8_t)decimal) % 2;
+    //     decimal /= 2;
+    // }
+    // for(uint8_t i = 0; i < 5; i++) {
+    //     digitalWrite(control[i], binary[i]);
+    // }
+
+    bool isFirstMux = true;
+    int muxChannel = 0;
+    if (LSIndex <= 7) {
+        muxChannel = 7 - LSIndex;
+    } else if (LSIndex <= 15 ) {
+        muxChannel = LSIndex;
+    } else if (LSIndex <= 23) {
+        isFirstMux = false;
+        muxChannel = 23 - LSIndex;
+    } else if (LSIndex <= 31) {
+        isFirstMux = false;
+        muxChannel = LSIndex - 16;
     }
-    for(uint8_t i = 0; i < 5; i++) {
-        digitalWrite(control[i], binary[i]);
+    digitalWrite(MUX1_S0, muxChannel & 0x1);
+    digitalWrite(MUX1_S1, (muxChannel >> 1) & 0x1);
+    digitalWrite(MUX1_S2, (muxChannel >> 2) & 0x1);
+    digitalWrite(MUX1_S3, (muxChannel >> 3) & 0x1);
+    readValue[LSIndex] = analogRead(isFirstMux ? MUX1_OUT : MUX2_OUT);
+    if(LSIndex == 15) {
+        readValue[LSIndex] = 0;
     }
-    readValue[LSIndex] = analogRead(controlOutput);
 }
 
 void LSMultiplexer::update(float heading) {
     for(uint8_t i = 0; i < LS_NUM; i++) {
         read(i);
-        onWhite[i] = (readValue[i] > thresholdValue[i]);
     }
+    for(uint8_t i = 0; i < LS_NUM; i++) {
+        onWhite[mod(32-(i-7), 32)] = (readValue[i] > thresholdValue[i]);
+            // Serial.printf ("%d ", onWhite[i]);
+    }
+    // Serial.println();
     for(uint8_t i = 0; i < LS_NUM; i ++) {
         if(!onWhite[i]) {
             if(onWhite[mod(i - 1, LS_NUM)] && onWhite[mod(i + 1, LS_NUM)]) {
@@ -135,6 +166,8 @@ void LSMultiplexer::update(float heading) {
             }
         }
     }
+    Serial.print(fieldLineAngle); Serial.print("\t");
+    Serial.println(fieldLineSize);
 }
 
 Movement LSMultiplexer::calculateOutAvoidance(float heading, Movement originalVal) {
