@@ -14,7 +14,7 @@
 
 #define NO_POS 120
 #define DEFEND_X 0
-#define DEFEND_Y -70
+#define DEFEND_Y -91.5
 #define ATTACK_X 0
 #define ATTACK_Y 91.5
 
@@ -151,7 +151,7 @@
 #define CENTRE_DISTANCE_KI 0
 #define CENTRE_DISTANCE_KD 0
 #define CENTRE_DISTANCE_MAX_SPEED 30
-#define DISTANCE_KP 3
+#define DISTANCE_KP 2
 #define DISTANCE_KI 0
 #define DISTANCE_KD 0
 #define DISTANCE_MAX_SPEED 100
@@ -169,8 +169,8 @@
 #define LS_DEFAULT_THRESHOLD 150
 #define LS_BUFFER 100
 #define LS_INTERVAL_ANGLE 11.25
-#define LS_BIG_SIZE 0.75
-#define LS_MEDIUM_SIZE 0.5
+#define LS_BIG_SIZE 0.0
+#define LS_MEDIUM_SIZE 0.0
 #define LS_SMALL_SIZE 0.25
 #define LS_AVOID_FAST 100
 #define LS_AVOID_MEDIUM 40

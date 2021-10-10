@@ -5,7 +5,7 @@ void MotorControllers::init() {
         pinMode(inOne[i], OUTPUT);
         pinMode(inTwo[i], OUTPUT);
         pinMode(pwm[i], OUTPUT);
-        digitalWrite(inOne[i], HIGH);
+        digitalWrite(inOne[i], LOW);
         digitalWrite(inTwo[i], HIGH);
         analogWrite(pwm[i], 0);
         // analogWriteFrequency(pwm[i], PWM_FREQUENCY);

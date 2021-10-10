@@ -50,8 +50,8 @@ while(True):
     uart.writechar(234)
     for byte in data:
         uart.writechar(byte)
-    img.draw_line(round(FRAME_WIDTH / 2) - 10, round(FRAME_HEIGHT / 2), round(FRAME_WIDTH / 2) + 10, round(FRAME_HEIGHT / 2))
-    img.draw_line(round(FRAME_WIDTH / 2), round(FRAME_HEIGHT / 2) + 10, round(FRAME_WIDTH / 2), round(FRAME_HEIGHT / 2) - 10)
-    img.draw_line(round(FRAME_WIDTH / 2), round(FRAME_HEIGHT / 2), 240 - data[0], 240 - data[1])
-    img.draw_line(round(FRAME_WIDTH / 2), round(FRAME_HEIGHT / 2), 240 - data[2], 240 - data[3])
-    img.draw_line(round(FRAME_WIDTH / 2), round(FRAME_HEIGHT / 2), 240 - data[4], 240 - data[5])
+    #img.draw_line(round(FRAME_WIDTH / 2) - 10, round(FRAME_HEIGHT / 2), round(FRAME_WIDTH / 2) + 10, round(FRAME_HEIGHT / 2))
+    #img.draw_line(round(FRAME_WIDTH / 2), round(FRAME_HEIGHT / 2) + 10, round(FRAME_WIDTH / 2), round(FRAME_HEIGHT / 2) - 10)
+    #img.draw_line(round(FRAME_WIDTH / 2), round(FRAME_HEIGHT / 2), 240 - data[0], 240 - data[1])
+    #img.draw_line(round(FRAME_WIDTH / 2), round(FRAME_HEIGHT / 2), 240 - data[2], 240 - data[3])
+    #img.draw_line(round(FRAME_WIDTH / 2), round(FRAME_HEIGHT / 2), 240 - data[4], 240 - data[5])

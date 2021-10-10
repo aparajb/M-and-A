@@ -60,7 +60,7 @@ Movement calculateAttackMovement() {
 }
 
 Movement calculateDefenseMovement() {
-    // if(camera.ball.exists()) {
+    if(camera.ball.exists()) {
     //     if(camera.ball.mag < 30) {
     //         if(angleIsInside(70, 110, camera.ball.arg)) {
     //             if(camera.robot.exists() && camera.robot.j < -30) {
@@ -68,15 +68,16 @@ Movement calculateDefenseMovement() {
     //             }
     //         }
     //     }
-    //     if(angleIsInside(0, 180, camera.ball.arg)) {
-    //         float distance = camera.robot.exists() ? -60 - camera.robot.j : 0;
-    //         return calculateMove(distancePID.update(distance, 0), sidewaysPID.update(90 - camera.ball.arg, 0));
-    //     }
+        if(angleIsInside(0, 180, camera.ball.arg)) {
+            Vect temp = Vect(DEFEND_X, DEFEND_Y, false) - camera.robot;
+            // float distance = camera.robot.exists() ? -60 - camera.robot.j : 0;
+            return calculateMove(centreDistancePID.update(temp.mag, 40), sidewaysPID.update(90 - camera.ball.arg, 0));
+        }
     //     return calculateAttackMovement();
-    // } else if(camera.robot.exists()) {
-    //     Vect temp = Vect(DEFEND_X, DEFEND_Y, false) - camera.robot;
-    //     return calculateMove(centreDistancePID.update(temp.mag, 40), -camera.robot.i);
-    // }
+    } else if(camera.robot.exists()) {
+        Vect temp = Vect(DEFEND_X, DEFEND_Y, false) - camera.robot;
+        return calculateMove(centreDistancePID.update(temp.mag, 40), -camera.robot.i);
+    }
     return calculateMove(0, 0);
 }
 
@@ -84,16 +85,14 @@ void setup() {
     delay(500);
     imu.init();
     camera.init();
-     lightSensors.init();
+    lightSensors.init();
     motors.init();
 }
 
 void loop() {
     imu.update();
-    // camera.update(imu.heading, true);
+    camera.update(imu.heading, true);
     lightSensors.update(imu.heading);
-    // tssps.update();
-    // Serial.println(lightSensors.lineDir);
-    Movement finalMovement = lightSensors.calculateOutAvoidance(imu.heading, calculateDefenseMovement());//bluetooth.thisData.role ? calculateAttackMovement() : calculateDefenseMovement());
+    Movement finalMovement = lightSensors.calculateOutAvoidance(imu.heading, calculateDefenseMovement());
     motors.update(finalMovement);
 }

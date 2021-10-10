@@ -166,21 +166,18 @@ void LSMultiplexer::update(float heading) {
             }
         }
     }
-    Serial.print(fieldLineAngle); Serial.print("\t");
-    Serial.println(fieldLineSize);
 }
 
 Movement LSMultiplexer::calculateOutAvoidance(float heading, Movement originalVal) {
     Movement sendVal = originalVal;
     if(!onField) {
-        if(fieldLineSize > LS_MEDIUM_SIZE) {
+        // if(fieldLineSize > LS_MEDIUM_SIZE) {
             sendVal.direction = floatMod(fieldLineAngle + 180 - heading, 360);
-            sendVal.speed = fieldLineSize > LS_BIG_SIZE ? LS_AVOID_FAST : LS_AVOID_MEDIUM;
-        } else if(fieldLineSize > LS_SMALL_SIZE) {
-            if(smallestAngleBetween(fieldLineAngle, sendVal.direction) < 60) {
-                sendVal.speed = 0;
-            }
-        }
+            sendVal.speed = LS_AVOID_FAST;//fieldLineSize > LS_BIG_SIZE ? LS_AVOID_FAST : LS_AVOID_MEDIUM;
+        // } else if(fieldLineSize > LS_SMALL_SIZE) {
+        //     if(smallestAngleBetween(fieldLineAngle, sendVal.direction) < 60) {
+        //         sendVal.speed = 0;
+        //     }
     }
     return sendVal;
 }
